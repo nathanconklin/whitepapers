@@ -1,6 +1,6 @@
 # whitepapers
 
-Documents that capture my thoughts, designs, analysis, specifications, and general useful contact for humans and AI to read
+Documents that capture my thoughts, designs, analysis, specifications, and general useful content for humans and AI to read
 
 Each subfolder holds one paper: the source document plus the rendered PDF, and in a few cases the Markdown the document was generated from.
 
