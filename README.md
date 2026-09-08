@@ -9,6 +9,7 @@ Each subfolder holds one paper: the source document plus the rendered PDF, and i
 | `15 Chat Interaction Techniques/` | `v6_chat-interaction-techniques.docx`, `v6_chat-interaction-techniques.pdf` |
 | `ARC, Chatbots, and Secrets Managment/` | `secrets-and-keys-management-whitepaper.docx`, `secrets-and-keys-management-whitepaper.md`, `secrets-and-keys-management-whitepaper.pdf`, `secrets-and-keys-management.md`, `secrets-and-keys-management.pdf`, `v1 chatbox-arc-design.docx`, `v1 chatbox-arc-design.pdf` |
 | `AutoAttacker Initial Project Concept/` | `AUTOATTACKER_Evidence_Grounded_Reasoning_Extension.docx`, `AUTOATTACKER_Evidence_Grounded_Reasoning_Extension.pdf`, `AutoAttacker Project Extension.png` |
+| `CoT, Visualization, and Human Interaction - Literature Review/` | `v1 cot-visualization-literature-review-whitepaper.docx`, `v1 cot-visualization-literature-review-whitepaper.md`, `v1 cot-visualization-literature-review-whitepaper.pdf` |
 | `Cyber Space to Work/` | `Cyber Space to Work v1.docx`, `Cyber Space to Work v1.pdf` |
 | `Directed Acyclical Graphs of Thought Cards/` | `Interactive_Reasoning_Graphs_for_Kimi_K3_Whitepaper.docx`, `Interactive_Reasoning_Graphs_for_Kimi_K3_Whitepaper.md`, `Interactive_Reasoning_Graphs_for_Kimi_K3_Whitepaper.pdf` |
 | `Evaluation of OpenSource Chatbots/` | `v8_openai_compatible_chat_clients_acm_refs.docx`, `v8_openai_compatible_chat_clients_acm_refs.pdf` |
