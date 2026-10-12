@@ -1,0 +1,129 @@
+{
+  "description": "One representative thumbnail per paper subfolder. Source paths are relative to the repository root; DOCX members are ZIP archive paths; PDF page numbers are one-based.",
+  "processing": "PNG output, maximum 720 by 480 pixels, original aspect ratio preserved. Existing figures retain the attribution and source context documented in their parent papers.",
+  "thumbnails": [
+    {
+      "folder": "15 Chat Interaction Techniques",
+      "thumbnail": "chat-interaction-techniques.png",
+      "source": "15 Chat Interaction Techniques/v6_chat-interaction-techniques.docx",
+      "member": "word/media/image11.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "ARC, Chatbots, and Secrets Managment",
+      "thumbnail": "arc-chatbots-secrets.png",
+      "source": "ARC, Chatbots, and Secrets Managment/secrets-and-keys-management-whitepaper.docx",
+      "member": "word/media/image1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "AutoAttacker Initial Project Concept",
+      "thumbnail": "autoattacker.png",
+      "source": "AutoAttacker Initial Project Concept/AUTOATTACKER_Evidence_Grounded_Reasoning_Extension.docx",
+      "member": "word/media/mdimage1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "CoT, Visualization, and Human Interaction - Literature Review",
+      "thumbnail": "cot-literature-review.png",
+      "source": "CoT, Visualization, and Human Interaction - Literature Review/v1 cot-visualization-literature-review-whitepaper.docx",
+      "member": "word/media/image19.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Cyber Space to Work",
+      "thumbnail": "cyber-space-to-work.png",
+      "source": "Cyber Space to Work/Cyber Space to Work v1.docx",
+      "member": "word/media/image2.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Directed Acyclical Graphs of Thought Cards",
+      "thumbnail": "reasoning-graphs.png",
+      "source": "Directed Acyclical Graphs of Thought Cards/Interactive_Reasoning_Graphs_for_Kimi_K3_Whitepaper.docx",
+      "member": "word/media/mdimage1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Evaluation of OpenSource Chatbots",
+      "thumbnail": "open-source-chatbots.png",
+      "source": "Evaluation of OpenSource Chatbots/v8_openai_compatible_chat_clients_acm_refs.docx",
+      "member": "word/media/image2.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Graduate School Orientation",
+      "thumbnail": "graduate-school-orientation.png",
+      "source": "Graduate School Orientation/Virginia-Tech-Graduate-School-Orientation-2026-Whitepaper-2.pdf",
+      "page": 1,
+      "image_xref": 14,
+      "description": "Figure 1: Virginia Tech campus on the morning of graduate school orientation.",
+      "method": "Embedded PDF illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "How to Science - Running an Agentic Study",
+      "thumbnail": "agentic-study.png",
+      "source": "How to Science - Running an Agentic Study/Automating_the_Application_of_HCI_Principles___v_2026_07_11.pdf",
+      "page": 2,
+      "image_xref": 2,
+      "description": "Figure illustrating HCI Skills and the human-AI Space to Think.",
+      "method": "Embedded PDF illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Interactive CoT Visualization + Cognitive Copilot",
+      "thumbnail": "cognitive-copilot.png",
+      "source": "Interactive CoT Visualization + Cognitive Copilot/v5 Interactive Visual Chain of Thought styled.docx",
+      "member": "word/media/image4.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Philosophy, Meaning, and AI",
+      "thumbnail": "philosophy-meaning-ai.png",
+      "source": "Philosophy, Meaning, and AI/Evolution_Intelligence_Meaning_and_AI_Whitepaper.docx",
+      "member": "word/media/mdimage1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Reasoning Model Access Layers",
+      "thumbnail": "reasoning-access-layers.png",
+      "source": "Reasoning Model Access Layers/v6_reasoning-access-layers.docx",
+      "member": "word/media/mdimage1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "ReasoningFlow with Tool Call and Web Search",
+      "thumbnail": "reasoningflow-tools-search.png",
+      "source": "ReasoningFlow with Tool Call and Web Search/ReasoningFlowWithToolCall Long.docx",
+      "member": "word/media/mdimage1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Software Project Layout - project-layout.md",
+      "thumbnail": "software-project-layout.png",
+      "source": "Software Project Layout - project-layout.md/project-layout.pdf",
+      "page": 1,
+      "method": "First-page preview rendered from the PDF."
+    },
+    {
+      "folder": "VIS SEA 2026 Notes on How to Present and Write Technical Papers",
+      "thumbnail": "write-generously.png",
+      "source": "VIS SEA 2026 Notes on How to Present and Write Technical Papers/write-generously.docx",
+      "member": "word/media/image1.jpeg",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Visual Scrollbars",
+      "thumbnail": "visual-scrollbars.png",
+      "source": "Visual Scrollbars/overview-detail-visual-scrollbar-whitepaper.docx",
+      "member": "word/media/image1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Voice Controlled Agents",
+      "thumbnail": "voice-controlled-agents.png",
+      "source": "Voice Controlled Agents/Voice_Controlled_Agentic_Development_Whitepaper.docx",
+      "member": "word/media/mdimage1.png",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    }
+  ]
+}
