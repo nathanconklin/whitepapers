@@ -112,6 +112,14 @@
       "method": "Embedded illustration, resized proportionally without cropping."
     },
     {
+      "folder": "Visual Multimodal Model Thinking",
+      "thumbnail": "visual-multimodal-thinking.png",
+      "source": "Visual Multimodal Model Thinking/visual-thinking-whitepaper.docx",
+      "member": "word/media/mdimage12.png",
+      "description": "Figure 12: Conceptual Space to Think synchronized multimodal reasoning workspace.",
+      "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
       "folder": "Visual Scrollbars",
       "thumbnail": "visual-scrollbars.png",
       "source": "Visual Scrollbars/overview-detail-visual-scrollbar-whitepaper.docx",
@@ -124,6 +132,13 @@
       "source": "Voice Controlled Agents/Voice_Controlled_Agentic_Development_Whitepaper.docx",
       "member": "word/media/mdimage1.png",
       "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "Websearch, Tools, and Context",
+      "thumbnail": "websearch-tools-context.png",
+      "source": "Websearch, Tools, and Context/websearch-sequence.jpg",
+      "description": "Sequence diagram showing model generation, web search, tool results, and answer continuation.",
+      "method": "Existing diagram, resized proportionally without cropping."
     }
   ]
 }
