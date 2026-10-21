@@ -1,0 +1,943 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1600 960" width="1600" height="960" role="img" aria-labelledby="svgTitle svgDesc">
+<title id="svgTitle">How the Reasoning Graph Local Simplification Algorithm Works</title>
+<desc id="svgDesc">Seven-step animated demonstration of ReasoningFlow deterministic browser-local reduction. Using the document's OpenAI example, 44 original nodes are grouped into 30 consecutive, source-linked nodes; endpoint protection, run allocation, TF-IDF and cosine grouping, adjacent merges, projection of original relationships, ELK layout and browser caching are visualized. The seven-stage animation auto-plays once, holds on the final frame, and includes optional controls when viewed as a standalone SVG.</desc>
+<defs>
+ <linearGradient id="bgGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#071425"/><stop offset="0.54" stop-color="#101C34"/><stop offset="1" stop-color="#0B1528"/></linearGradient>
+ <linearGradient id="cardGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14263F"/><stop offset="1" stop-color="#101E34"/></linearGradient>
+ <linearGradient id="highlight" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#45D7C8"/><stop offset="1" stop-color="#9EE5FE"/></linearGradient>
+ <linearGradient id="barFill" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4FD8C9"/><stop offset="1" stop-color="#A4DCFF"/></linearGradient>
+ <radialGradient id="aura"><stop offset="0" stop-color="#143958" stop-opacity=".9"/><stop offset="1" stop-color="#143958" stop-opacity="0"/></radialGradient>
+ <pattern id="grid" width="34" height="34" patternUnits="userSpaceOnUse"><path d="M34 0H0V34" fill="none" stroke="#29435A" stroke-width=".7" opacity=".16"/></pattern>
+ <marker id="arrowCyan" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5 1 9Z" fill="#67DAD0"/></marker>
+ <marker id="arrowMuted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M1 1L9 5 1 9Z" fill="#59738E"/></marker>
+ <filter id="softShadow" x="-20%" y="-30%" width="140%" height="180%"><feDropShadow dx="0" dy="7" stdDeviation="11" flood-color="#010815" flood-opacity=".34"/></filter>
+ <filter id="glow" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<style><![CDATA[@keyframes stage1{0%{opacity:1} 12.5000%{opacity:1} 14.2857%{opacity:0} 100%{opacity:0}}.stage1{animation:stage1 84s linear 1 forwards;}@keyframes stage2{0%{opacity:0} 14.2857%{opacity:0} 16.1905%{opacity:1} 26.7857%{opacity:1} 28.5714%{opacity:0} 100%{opacity:0}}.stage2{animation:stage2 84s linear 1 forwards;}@keyframes stage3{0%{opacity:0} 28.5714%{opacity:0} 30.4762%{opacity:1} 41.0714%{opacity:1} 42.8571%{opacity:0} 100%{opacity:0}}.stage3{animation:stage3 84s linear 1 forwards;}@keyframes stage4{0%{opacity:0} 42.8571%{opacity:0} 44.7619%{opacity:1} 55.3571%{opacity:1} 57.1429%{opacity:0} 100%{opacity:0}}.stage4{animation:stage4 84s linear 1 forwards;}@keyframes stage5{0%{opacity:0} 57.1429%{opacity:0} 59.0476%{opacity:1} 69.6429%{opacity:1} 71.4286%{opacity:0} 100%{opacity:0}}.stage5{animation:stage5 84s linear 1 forwards;}@keyframes stage6{0%{opacity:0} 71.4286%{opacity:0} 73.3333%{opacity:1} 83.9286%{opacity:1} 85.7143%{opacity:0} 100%{opacity:0}}.stage6{animation:stage6 84s linear 1 forwards;}@keyframes stage7{0%{opacity:0} 85.7143%{opacity:0} 87.6190%{opacity:1} 98.2143%{opacity:1} 100.0000%{opacity:1} 100%{opacity:1}}.stage7{animation:stage7 84s linear 1 forwards;}
+.scene{opacity:0;pointer-events:none;}
+.nav-selected{fill:#4BDCCA;opacity:0;}
+.svg-progress{transform-box:fill-box;transform-origin:left center;animation:barProgress 84s linear 1 forwards;}
+@keyframes barProgress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes shimmer{0%,100%{opacity:.37}50%{opacity:1}}
+@keyframes pulse{0%,100%{opacity:.22;transform:scale(1)}50%{opacity:.84;transform:scale(1.11)}}
+@keyframes moveDash{to{stroke-dashoffset:-35}}
+@keyframes scanslide{0%{transform:translateX(0px);opacity:0}12%{opacity:.72}80%{opacity:.72}100%{transform:translateX(945px);opacity:0}}
+@keyframes joinUnit{0%,12%{transform:translateX(0px)}37%,60%{transform:translateX(-72px)}75%,100%{transform:translateX(0px)}}
+@keyframes chipBreathe{0%,100%{stroke-opacity:.5}50%{stroke-opacity:1}}
+@keyframes nodePop{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes hueMove{0%,100%{opacity:.35}50%{opacity:.85}}
+.flow-animated{stroke-dasharray:8 9;animation:moveDash 1.8s linear infinite}
+.pulse-ring{transform-box:fill-box;transform-origin:center;animation:pulse 2s ease-in-out infinite}
+.scanning-line{animation:scanslide 5s ease-in-out infinite}
+.join-animated{animation:joinUnit 4.8s ease-in-out infinite}
+.glow-chips{animation:chipBreathe 2.3s ease-in-out infinite}
+.phase-indicator{animation:shimmer 2s ease-in-out infinite}
+.nav-label{cursor:pointer}
+.controls{cursor:pointer}
+@media (prefers-reduced-motion:reduce){
+ .scene,.svg-progress,.flow-animated,.pulse-ring,.scanning-line,.join-animated,.glow-chips,.phase-indicator{animation:none!important}
+ .scene{opacity:0!important}
+ .stage7{opacity:1!important}
+ .svg-progress{transform:none!important}
+}
+]]></style>
+<rect x="0" y="0" width="1600" height="960" rx="0" fill="url(#bgGradient)" stroke="none" stroke-width="1" />
+<ellipse cx="1240" cy="210" rx="430" ry="330" fill="url(#aura)" opacity=".75"/>
+<ellipse cx="250" cy="790" rx="350" ry="230" fill="url(#aura)" opacity=".36"/>
+<rect x="28" y="26" width="1544" height="909" rx="28" fill="#0A172A" stroke="#344864" stroke-width="1" />
+<rect x="29" y="26" width="1542" height="910" rx="27" fill="url(#grid)" stroke="none" stroke-width="1" />
+<circle cx="78" cy="59" r="7" fill="#FFAF76" stroke="none" stroke-width="1" />
+<text x="95" y="64" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#B3C4DA" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.65" >REASONING WORKSPACE / ALGORITHM WALKTHROUGH</text>
+<text x="74" y="113" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="43" fill="#F8FAFF" font-weight="750" text-anchor="start" opacity="1" letter-spacing="-1.0" >How a reasoning graph gets simpler</text>
+<text x="76" y="147" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" fill="#A6B8CC" font-weight="400" text-anchor="start" opacity="1" >Local reduction: consecutive groups, preserved evidence, and no model summarization calls.</text>
+<rect x="1291" y="67" width="233" height="72" rx="17" fill="#17324A" stroke="#3B776F" stroke-width="1.4" />
+<text x="1311" y="94" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" fill="#77DDC7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.7" >CASE STUDY</text>
+<text x="1311" y="122" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="27" fill="#EBFFFF" font-weight="800" text-anchor="start" opacity="1" >44  →  30</text>
+<text x="1461" y="120" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" fill="#9FBACB" font-weight="600" text-anchor="start" opacity="1" >NODES</text>
+<g id="nav1" class="nav-label" role="button" tabindex="0" aria-label="Jump to stage 1: capture">
+<rect x="69.0" y="172" width="196" height="43" rx="11" fill="#10223A" stroke="#29465F" stroke-width="1.1" />
+<g class="scene stage1"><rect x="71.0" y="174" width="192" height="39" rx="9" fill="#1E4956" stroke="#62DDCE" stroke-width="1.3" /></g>
+<text x="83.0" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#5EDCCC" font-weight="800" text-anchor="start" opacity="1" >01</text>
+<text x="114.0" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#D6E6F6" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".35" >CAPTURE</text>
+</g>
+<g id="nav2" class="nav-label" role="button" tabindex="0" aria-label="Jump to stage 2: protect">
+<rect x="278.1" y="172" width="196" height="43" rx="11" fill="#10223A" stroke="#29465F" stroke-width="1.1" />
+<g class="scene stage2"><rect x="280.1" y="174" width="192" height="39" rx="9" fill="#1E4956" stroke="#62DDCE" stroke-width="1.3" /></g>
+<text x="292.1" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#5EDCCC" font-weight="800" text-anchor="start" opacity="1" >02</text>
+<text x="323.1" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#D6E6F6" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".35" >PROTECT</text>
+</g>
+<g id="nav3" class="nav-label" role="button" tabindex="0" aria-label="Jump to stage 3: allocate">
+<rect x="487.2" y="172" width="196" height="43" rx="11" fill="#10223A" stroke="#29465F" stroke-width="1.1" />
+<g class="scene stage3"><rect x="489.2" y="174" width="192" height="39" rx="9" fill="#1E4956" stroke="#62DDCE" stroke-width="1.3" /></g>
+<text x="501.2" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#5EDCCC" font-weight="800" text-anchor="start" opacity="1" >03</text>
+<text x="532.2" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#D6E6F6" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".35" >ALLOCATE</text>
+</g>
+<g id="nav4" class="nav-label" role="button" tabindex="0" aria-label="Jump to stage 4: similarity">
+<rect x="696.3" y="172" width="196" height="43" rx="11" fill="#10223A" stroke="#29465F" stroke-width="1.1" />
+<g class="scene stage4"><rect x="698.3" y="174" width="192" height="39" rx="9" fill="#1E4956" stroke="#62DDCE" stroke-width="1.3" /></g>
+<text x="710.3" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#5EDCCC" font-weight="800" text-anchor="start" opacity="1" >04</text>
+<text x="741.3" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#D6E6F6" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".35" >SIMILARITY</text>
+</g>
+<g id="nav5" class="nav-label" role="button" tabindex="0" aria-label="Jump to stage 5: merge">
+<rect x="905.4" y="172" width="196" height="43" rx="11" fill="#10223A" stroke="#29465F" stroke-width="1.1" />
+<g class="scene stage5"><rect x="907.4" y="174" width="192" height="39" rx="9" fill="#1E4956" stroke="#62DDCE" stroke-width="1.3" /></g>
+<text x="919.4" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#5EDCCC" font-weight="800" text-anchor="start" opacity="1" >05</text>
+<text x="950.4" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#D6E6F6" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".35" >MERGE</text>
+</g>
+<g id="nav6" class="nav-label" role="button" tabindex="0" aria-label="Jump to stage 6: project">
+<rect x="1114.5" y="172" width="196" height="43" rx="11" fill="#10223A" stroke="#29465F" stroke-width="1.1" />
+<g class="scene stage6"><rect x="1116.5" y="174" width="192" height="39" rx="9" fill="#1E4956" stroke="#62DDCE" stroke-width="1.3" /></g>
+<text x="1128.5" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#5EDCCC" font-weight="800" text-anchor="start" opacity="1" >06</text>
+<text x="1159.5" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#D6E6F6" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".35" >PROJECT</text>
+</g>
+<g id="nav7" class="nav-label" role="button" tabindex="0" aria-label="Jump to stage 7: render">
+<rect x="1323.6" y="172" width="196" height="43" rx="11" fill="#10223A" stroke="#29465F" stroke-width="1.1" />
+<g class="scene stage7"><rect x="1325.6" y="174" width="192" height="39" rx="9" fill="#1E4956" stroke="#62DDCE" stroke-width="1.3" /></g>
+<text x="1337.6" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#5EDCCC" font-weight="800" text-anchor="start" opacity="1" >07</text>
+<text x="1368.6" y="199" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#D6E6F6" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".35" >RENDER</text>
+</g>
+<rect x="65" y="232" width="1088" height="602" rx="21" fill="url(#cardGradient)" stroke="#314962" stroke-width="1.2" filter="url(#softShadow)"/>
+<rect x="1171" y="232" width="360" height="602" rx="21" fill="url(#cardGradient)" stroke="#314962" stroke-width="1.2" filter="url(#softShadow)"/>
+<line x1="1189" y1="622" x2="1511" y2="622" stroke="#344C65" stroke-width="1" />
+<text x="1200" y="655" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#86A8BF" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.3" >CORE INVARIANTS</text>
+<circle cx="1209" cy="682" r="9" fill="#183C49" stroke="#317A70" stroke-width="1" />
+<path d="M1204 682 l4 4 6 -8" fill="none" stroke="#6CDCCF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+<text x="1228" y="687" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#D5E4F5" font-weight="400" text-anchor="start" opacity="1" >All original nodes accounted for</text>
+<circle cx="1209" cy="715" r="9" fill="#183C49" stroke="#317A70" stroke-width="1" />
+<path d="M1204 715 l4 4 6 -8" fill="none" stroke="#6CDCCF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+<text x="1228" y="720" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#D5E4F5" font-weight="400" text-anchor="start" opacity="1" >Source ranges remain selectable</text>
+<circle cx="1209" cy="748" r="9" fill="#183C49" stroke="#317A70" stroke-width="1" />
+<path d="M1204 748 l4 4 6 -8" fill="none" stroke="#6CDCCF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+<text x="1228" y="753" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#D5E4F5" font-weight="400" text-anchor="start" opacity="1" >No new grouping edges</text>
+<circle cx="1209" cy="781" r="9" fill="#183C49" stroke="#317A70" stroke-width="1" />
+<path d="M1204 781 l4 4 6 -8" fill="none" stroke="#6CDCCF" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" />
+<text x="1228" y="786" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#D5E4F5" font-weight="400" text-anchor="start" opacity="1" >Forward order preserves a DAG</text>
+<g class="scene stage1">
+<text x="98" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#6FE3D7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >STEP 01  /  SOURCE-LINKED INPUT</text>
+<text x="98" y="319" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" fill="#F3F8FF" font-weight="700" text-anchor="start" opacity="1" >Capture the complete ReasoningFlow</text>
+<text x="99" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#9FB4CD" font-weight="400" text-anchor="start" opacity="1" >Each recorded node becomes one ordered membership unit; the source text is never rewritten.</text>
+<rect x="98" y="382" width="260" height="26" rx="8" fill="#1C3850" stroke="none" stroke-width="1" />
+<text x="111" y="400" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#9DDFDF" font-weight="700" text-anchor="start" opacity="1" >44 ORIGINAL MEMBERSHIP UNITS</text>
+None
+<rect x="100.0" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="114.0" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="110.0" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U00</text>
+<text x="150.0" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >00</text>
+<rect x="191.8" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="205.8" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="201.8" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U01</text>
+<text x="241.8" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >01</text>
+<rect x="283.6" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="297.6" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="293.6" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U02</text>
+<text x="333.6" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >02</text>
+<rect x="375.4" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="389.4" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="385.4" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U03</text>
+<text x="425.4" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >03</text>
+<rect x="467.2" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="481.2" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="477.2" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U04</text>
+<text x="517.2" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >04</text>
+<rect x="559.0" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="573.0" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="569.0" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U05</text>
+<text x="609.0" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >05</text>
+<rect x="650.8" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="664.8" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="660.8" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U06</text>
+<text x="700.8" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >06</text>
+<rect x="742.6" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="756.6" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="752.6" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U07</text>
+<text x="792.6" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >07</text>
+<rect x="834.4" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="848.4" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="844.4" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U08</text>
+<text x="884.4" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >08</text>
+<rect x="926.2" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="940.2" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="936.1999999999999" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U09</text>
+<text x="976.1999999999999" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >09</text>
+<rect x="1018.0" y="422" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="1032.0" cy="437" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="1028.0" y="458" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U10</text>
+<text x="1068.0" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >10</text>
+<rect x="100.0" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="114.0" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="110.0" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U11</text>
+<text x="150.0" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >11</text>
+<rect x="191.8" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="205.8" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="201.8" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U12</text>
+<text x="241.8" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >12</text>
+<rect x="283.6" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="297.6" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="293.6" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U13</text>
+<text x="333.6" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >13</text>
+<rect x="375.4" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="389.4" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="385.4" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U14</text>
+<text x="425.4" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >14</text>
+<rect x="467.2" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="481.2" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="477.2" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U15</text>
+<text x="517.2" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >15</text>
+<rect x="559.0" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="573.0" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="569.0" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U16</text>
+<text x="609.0" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >16</text>
+<rect x="650.8" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="664.8" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="660.8" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U17</text>
+<text x="700.8" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >17</text>
+<rect x="742.6" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="756.6" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="752.6" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U18</text>
+<text x="792.6" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >18</text>
+<rect x="834.4" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="848.4" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="844.4" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U19</text>
+<text x="884.4" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >19</text>
+<rect x="926.2" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="940.2" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="936.1999999999999" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U20</text>
+<text x="976.1999999999999" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >20</text>
+<rect x="1018.0" y="490" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="1032.0" cy="505" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="1028.0" y="526" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U21</text>
+<text x="1068.0" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >21</text>
+<rect x="100.0" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="114.0" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="110.0" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U22</text>
+<text x="150.0" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >22</text>
+<rect x="191.8" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="205.8" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="201.8" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U23</text>
+<text x="241.8" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >23</text>
+<rect x="283.6" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="297.6" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="293.6" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U24</text>
+<text x="333.6" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >24</text>
+<rect x="375.4" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="389.4" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="385.4" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U25</text>
+<text x="425.4" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >25</text>
+<rect x="467.2" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="481.2" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="477.2" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U26</text>
+<text x="517.2" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >26</text>
+<rect x="559.0" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="573.0" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="569.0" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U27</text>
+<text x="609.0" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >27</text>
+<rect x="650.8" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="664.8" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="660.8" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U28</text>
+<text x="700.8" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >28</text>
+<rect x="742.6" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="756.6" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="752.6" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U29</text>
+<text x="792.6" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >29</text>
+<rect x="834.4" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="848.4" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="844.4" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U30</text>
+<text x="884.4" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >30</text>
+<rect x="926.2" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="940.2" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="936.1999999999999" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U31</text>
+<text x="976.1999999999999" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >31</text>
+<rect x="1018.0" y="558" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="1032.0" cy="573" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="1028.0" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U32</text>
+<text x="1068.0" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >32</text>
+<rect x="100.0" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="114.0" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="110.0" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U33</text>
+<text x="150.0" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >33</text>
+<rect x="191.8" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="205.8" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="201.8" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U34</text>
+<text x="241.8" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >34</text>
+<rect x="283.6" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="297.6" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="293.6" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U35</text>
+<text x="333.6" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >35</text>
+<rect x="375.4" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="389.4" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="385.4" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U36</text>
+<text x="425.4" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >36</text>
+<rect x="467.2" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="481.2" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="477.2" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U37</text>
+<text x="517.2" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >37</text>
+<rect x="559.0" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="573.0" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="569.0" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U38</text>
+<text x="609.0" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >38</text>
+<rect x="650.8" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="664.8" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="660.8" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U39</text>
+<text x="700.8" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >39</text>
+<rect x="742.6" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="756.6" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="752.6" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U40</text>
+<text x="792.6" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >40</text>
+<rect x="834.4" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="848.4" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="844.4" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U41</text>
+<text x="884.4" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >41</text>
+<rect x="926.2" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="940.2" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="936.1999999999999" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U42</text>
+<text x="976.1999999999999" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >42</text>
+<rect x="1018.0" y="626" width="81.5" height="52" rx="9" fill="#1D3651" stroke="#41637F" stroke-width="1.0" />
+<circle cx="1032.0" cy="641" r="3.5" fill="#5ED6D5" stroke="none" stroke-width="1" />
+<text x="1028.0" y="662" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E9F7FF" font-weight="700" text-anchor="start" opacity="1" >U43</text>
+<text x="1068.0" y="644" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#6C90A7" font-weight="400" text-anchor="start" opacity="1" >43</text>
+<g class="scanning-line">
+<rect x="101" y="415" width="50" height="261" rx="10" fill="url(#highlight)" stroke="none" stroke-width="1" opacity=".12"/>
+<line x1="101" y1="413" x2="101" y2="678" stroke="#57E0D6" stroke-width="2" opacity=".65"/>
+</g>
+<rect x="99" y="722" width="314" height="73" rx="11" fill="#132B42" stroke="#34556A" stroke-width="1" />
+<text x="115" y="748" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" fill="#E2F3FF" font-weight="700" text-anchor="start" opacity="1" >44 source-linked units</text>
+<text x="115" y="774" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#95B6C9" font-weight="400" text-anchor="start" opacity="1" >stable IDs + recorded order</text>
+<rect x="432" y="722" width="314" height="73" rx="11" fill="#132B42" stroke="#34556A" stroke-width="1" />
+<text x="448" y="748" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" fill="#E2F3FF" font-weight="700" text-anchor="start" opacity="1" >61 original relationships</text>
+<text x="448" y="774" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#95B6C9" font-weight="400" text-anchor="start" opacity="1" >all retained as evidence</text>
+<rect x="764" y="722" width="352" height="73" rx="11" fill="#132B42" stroke="#34556A" stroke-width="1" />
+<text x="780" y="748" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" fill="#E2F3FF" font-weight="700" text-anchor="start" opacity="1" >Browser-side processing</text>
+<text x="780" y="774" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#95B6C9" font-weight="400" text-anchor="start" opacity="1" >annotation, grouping, layout</text>
+</g>
+<g class="scene stage2">
+<text x="98" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#6FE3D7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >STEP 02  /  DETAIL DECISION</text>
+<text x="98" y="319" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" fill="#F3F8FF" font-weight="700" text-anchor="start" opacity="1" >Decide what must stay separate</text>
+<text x="99" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#9FB4CD" font-weight="400" text-anchor="start" opacity="1" >The actual algorithm switches to grouping only when the source graph has more than 30 nodes.</text>
+<rect x="104" y="392" width="460" height="114" rx="13" fill="#172A43" stroke="#4B6A83" stroke-width="1.4" />
+<text x="127" y="430" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A8C4D8" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.2" >ACTUAL NODE COUNT</text>
+<text x="127" y="481" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="46" fill="#FCF8FE" font-weight="800" text-anchor="start" opacity="1" >44</text>
+<text x="205" y="479" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="37" fill="#F3AD82" font-weight="650" text-anchor="start" opacity="1" >&gt;</text>
+<text x="258" y="481" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="46" fill="#6CDFD6" font-weight="800" text-anchor="start" opacity="1" >30</text>
+<text x="331" y="475" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="21" fill="#E3EEFB" font-weight="700" text-anchor="start" opacity="1" >→  GROUP MODE</text>
+<rect x="592" y="392" width="518" height="114" rx="13" fill="#122B38" stroke="#3C746D" stroke-width="1.4" />
+<text x="618" y="430" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#69DCCE" font-weight="700" text-anchor="start" opacity="1" >WHEN N ≤ 30</text>
+<text x="618" y="467" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="21" fill="#E5F6FF" font-weight="650" text-anchor="start" opacity="1" >Keep every node and every edge</text>
+<text x="618" y="488" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#95BAC5" font-weight="400" text-anchor="start" opacity="1" >No similarity calculation required</text>
+<text x="102" y="547" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#91B2C8" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.1" >CONSECUTIVE INTERVALS IN THE 44-NODE EXAMPLE</text>
+<rect x="102" y="579" width="96" height="106" rx="12" fill="#265E59" stroke="#70DFD1" stroke-width="1.6" />
+<text x="117" y="611" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" fill="#EDF8FF" font-weight="750" text-anchor="start" opacity="1" >U0</text>
+<text x="117" y="643" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#CAE0E8" font-weight="400" text-anchor="start" opacity="1" >protected</text>
+<circle cx="182" cy="596" r="6" fill="none" stroke="#70DFD1" stroke-width="1.7" />
+<g class="pulse-ring"><circle cx="182" cy="596" r="12" fill="none" stroke="#70DFD1" stroke-width="1.4" /></g>
+<rect x="208" y="579" width="595" height="106" rx="12" fill="#173D56" stroke="#74BBE2" stroke-width="1.6" />
+<text x="223" y="611" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" fill="#EDF8FF" font-weight="750" text-anchor="start" opacity="1" >U1–U39</text>
+<text x="223" y="643" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#CAE0E8" font-weight="400" text-anchor="start" opacity="1" >39 flexible units</text>
+<rect x="813" y="579" width="96" height="106" rx="12" fill="#4C3B68" stroke="#D6B8FC" stroke-width="1.6" />
+<text x="828" y="611" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" fill="#EDF8FF" font-weight="750" text-anchor="start" opacity="1" >U40</text>
+<text x="828" y="643" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#CAE0E8" font-weight="400" text-anchor="start" opacity="1" >protected</text>
+<circle cx="893" cy="596" r="6" fill="none" stroke="#D6B8FC" stroke-width="1.7" />
+<g class="pulse-ring"><circle cx="893" cy="596" r="12" fill="none" stroke="#D6B8FC" stroke-width="1.4" /></g>
+<rect x="919" y="579" width="190" height="106" rx="12" fill="#574331" stroke="#ECC18F" stroke-width="1.6" />
+<text x="934" y="611" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" fill="#EDF8FF" font-weight="750" text-anchor="start" opacity="1" >U41–U43</text>
+<text x="934" y="643" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#CAE0E8" font-weight="400" text-anchor="start" opacity="1" >3 tail units</text>
+<line x1="203" y1="561" x2="203" y2="711" stroke="#6884A1" stroke-width="1.4" stroke-dasharray="4 7" />
+<line x1="809" y1="561" x2="809" y2="711" stroke="#6884A1" stroke-width="1.4" stroke-dasharray="4 7" />
+<line x1="914" y1="561" x2="914" y2="711" stroke="#6884A1" stroke-width="1.4" stroke-dasharray="4 7" />
+<text x="108" y="753" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#E3F0FE" font-weight="600" text-anchor="start" opacity="1" >Endpoint protection follows the first and last generated reasoning/research nodes.</text>
+<text x="108" y="779" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#A7BED1" font-weight="400" text-anchor="start" opacity="1" >Tool records can appear afterward: U40 is protected even though U41–U43 follow it.</text>
+</g>
+<g class="scene stage3">
+<text x="98" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#6FE3D7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >STEP 03  /  OUTPUT BUDGET</text>
+<text x="98" y="319" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" fill="#F3F8FF" font-weight="700" text-anchor="start" opacity="1" >Allocate at most 30 output slots</text>
+<text x="99" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#9FB4CD" font-weight="400" text-anchor="start" opacity="1" >Start with one slot per interval; distribute the remaining slots by flexible-run capacity.</text>
+<text x="112" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="54" fill="#7DDCCE" font-weight="800" text-anchor="start" opacity="1" >1</text>
+<text x="204" y="417" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="38" fill="#7B92A9" font-weight="400" text-anchor="start" opacity="1" >+</text>
+<text x="278" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="54" fill="#91CBFF" font-weight="800" text-anchor="start" opacity="1" >26</text>
+<text x="423" y="417" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="38" fill="#7B92A9" font-weight="400" text-anchor="start" opacity="1" >+</text>
+<text x="490" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="54" fill="#D8B1FF" font-weight="800" text-anchor="start" opacity="1" >1</text>
+<text x="578" y="417" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="38" fill="#7B92A9" font-weight="400" text-anchor="start" opacity="1" >+</text>
+<text x="649" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="54" fill="#FBC993" font-weight="800" text-anchor="start" opacity="1" >2</text>
+<text x="736" y="417" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="38" fill="#7B92A9" font-weight="400" text-anchor="start" opacity="1" >=</text>
+<text x="808" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="54" fill="#FAFDFF" font-weight="800" text-anchor="start" opacity="1" >30 slots</text>
+<rect x="101" y="460" width="168" height="217" rx="14" fill="#214D4E" stroke="#77DCCF" stroke-width="1.3" />
+<text x="117" y="488" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F0F7FF" font-weight="700" text-anchor="start" opacity="1" >U0</text>
+<text x="117" y="514" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#ADC9D7" font-weight="400" text-anchor="start" opacity="1" >1 slot</text>
+<rect x="285" y="460" width="496" height="217" rx="14" fill="#183A53" stroke="#84C5ED" stroke-width="1.3" />
+<text x="301" y="488" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F0F7FF" font-weight="700" text-anchor="start" opacity="1" >U1–U39</text>
+<text x="301" y="514" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#ADC9D7" font-weight="400" text-anchor="start" opacity="1" >26 slots</text>
+<rect x="797" y="460" width="151" height="217" rx="14" fill="#403657" stroke="#CAB0FF" stroke-width="1.3" />
+<text x="813" y="488" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F0F7FF" font-weight="700" text-anchor="start" opacity="1" >U40</text>
+<text x="813" y="514" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#ADC9D7" font-weight="400" text-anchor="start" opacity="1" >1 slot</text>
+<rect x="964" y="460" width="148" height="217" rx="14" fill="#513B2F" stroke="#F8BD80" stroke-width="1.3" />
+<text x="980" y="488" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F0F7FF" font-weight="700" text-anchor="start" opacity="1" >U41–U43</text>
+<text x="980" y="514" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#ADC9D7" font-weight="400" text-anchor="start" opacity="1" >2 slots</text>
+<circle cx="185" cy="591" r="18" fill="#55C9B8" stroke="none" stroke-width="1" />
+<text x="185" y="635" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#B1DFD9" font-weight="600" text-anchor="middle" opacity="1" >protected</text>
+<rect x="301.0" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="336.5" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="372.0" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="407.5" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="443.0" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="478.5" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="514.0" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="549.5" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="585.0" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="620.5" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="656.0" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="691.5" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="727.0" y="553" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="301.0" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="336.5" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="372.0" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="407.5" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="443.0" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="478.5" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="514.0" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="549.5" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="585.0" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="620.5" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="656.0" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="691.5" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<rect x="727.0" y="593" width="27" height="25" rx="5" fill="#70B7E2" stroke="#ABDCF2" stroke-width="0.4" />
+<text x="533" y="643" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#B2CCD9" font-weight="500" text-anchor="middle" opacity="1" >maximum; not a required fill</text>
+<circle cx="870" cy="591" r="18" fill="#C7B0FD" stroke="none" stroke-width="1" />
+<rect x="993" y="574" width="35" height="35" rx="7" fill="#EFB981" stroke="#FFD4A4" stroke-width="0.5" />
+<rect x="1044" y="574" width="35" height="35" rx="7" fill="#EFB981" stroke="#FFD4A4" stroke-width="0.5" />
+<text x="1040" y="643" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#F6D0B6" font-weight="600" text-anchor="middle" opacity="1" >tail</text>
+<rect x="105" y="713" width="1007" height="88" rx="12" fill="#112B40" stroke="#34536C" stroke-width="1" />
+<text x="124" y="744" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E7F4FB" font-weight="700" text-anchor="start" opacity="1" >Allocation math</text>
+<text x="306" y="744" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#A6D5D8" font-weight="700" text-anchor="start" opacity="1" >4 base slots</text>
+<text x="445" y="744" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#7893AA" font-weight="400" text-anchor="start" opacity="1" >+</text>
+<text x="478" y="744" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#A6D5D8" font-weight="700" text-anchor="start" opacity="1" >26 remaining</text>
+<text x="626" y="744" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="18" fill="#7893AA" font-weight="400" text-anchor="start" opacity="1" >→</text>
+<text x="674" y="744" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#D1E5F4" font-weight="400" text-anchor="start" opacity="1" >middle capacity 38, tail capacity 2</text>
+<text x="124" y="775" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#9AB9CE" font-weight="400" text-anchor="start" opacity="1" >Floors + largest remainders decide extra slots. Unused slots are not redistributed later.</text>
+</g>
+<g class="scene stage4">
+<text x="98" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#6FE3D7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >STEP 04  /  LEXICAL SIMILARITY</text>
+<text x="98" y="319" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" fill="#F3F8FF" font-weight="700" text-anchor="start" opacity="1" >Group only consecutive units</text>
+<text x="99" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#9FB4CD" font-weight="400" text-anchor="start" opacity="1" >TF-IDF turns source slices into sparse vectors; cosine controls the first forward pass.</text>
+<rect x="103" y="387" width="443" height="342" rx="14" fill="#112A42" stroke="#31566A" stroke-width="1" />
+<text x="124" y="420" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#64DCD2" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1" >VECTORIZE EACH FLEXIBLE RUN</text>
+<text x="124" y="451" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="30" fill="#E6F7FF" font-weight="800" text-anchor="start" opacity="1" >TF-IDF</text>
+<text x="258" y="451" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#A9C9DD" font-weight="400" text-anchor="start" opacity="1" >top 48 terms / unit</text>
+<text x="125" y="490" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#A5BDCF" font-weight="400" text-anchor="start" opacity="1" >lowercase → tokenize → stop words</text>
+<text x="125" y="541" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#B7CADC" font-weight="550" text-anchor="start" opacity="1" >alpha</text>
+<rect x="218" y="524" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="218" y="524" width="73.0" height="15" rx="4" fill="#6BC7CB" stroke="none" stroke-width="1" />
+<rect x="319" y="524" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="319" y="524" width="45.4" height="15" rx="4" fill="#84BCEC" stroke="none" stroke-width="1" />
+<rect x="420" y="524" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="420" y="524" width="24.5" height="15" rx="4" fill="#B8A7F0" stroke="none" stroke-width="1" />
+<text x="125" y="583" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#B7CADC" font-weight="550" text-anchor="start" opacity="1" >beta</text>
+<rect x="218" y="566" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="218" y="566" width="43.4" height="15" rx="4" fill="#6BC7CB" stroke="none" stroke-width="1" />
+<rect x="319" y="566" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="319" y="566" width="69.5" height="15" rx="4" fill="#84BCEC" stroke="none" stroke-width="1" />
+<rect x="420" y="566" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="420" y="566" width="22.1" height="15" rx="4" fill="#B8A7F0" stroke="none" stroke-width="1" />
+<text x="125" y="625" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#B7CADC" font-weight="550" text-anchor="start" opacity="1" >gamma</text>
+<rect x="218" y="608" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="218" y="608" width="30.4" height="15" rx="4" fill="#6BC7CB" stroke="none" stroke-width="1" />
+<rect x="319" y="608" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="319" y="608" width="37.1" height="15" rx="4" fill="#84BCEC" stroke="none" stroke-width="1" />
+<rect x="420" y="608" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="420" y="608" width="69.5" height="15" rx="4" fill="#B8A7F0" stroke="none" stroke-width="1" />
+<text x="125" y="667" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#B7CADC" font-weight="550" text-anchor="start" opacity="1" >delta</text>
+<rect x="218" y="650" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="218" y="650" width="18.6" height="15" rx="4" fill="#6BC7CB" stroke="none" stroke-width="1" />
+<rect x="319" y="650" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="319" y="650" width="28.8" height="15" rx="4" fill="#84BCEC" stroke="none" stroke-width="1" />
+<rect x="420" y="650" width="75" height="15" rx="4" fill="#213B53" stroke="none" stroke-width="1" />
+<rect x="420" y="650" width="52.5" height="15" rx="4" fill="#B8A7F0" stroke="none" stroke-width="1" />
+<text x="126" y="707" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#9FE0DA" font-weight="650" text-anchor="start" opacity="1" >normalize → cosine dot product</text>
+<rect x="563" y="387" width="546" height="342" rx="14" fill="#132A43" stroke="#365775" stroke-width="1" />
+<text x="586" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#78E0D2" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1" >GREEDY FORWARD SCAN</text>
+<text x="591" y="464" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#B4D3E4" font-weight="400" text-anchor="start" opacity="1" >last group centroid</text>
+<rect x="581" y="476" width="247" height="73" rx="13" fill="#22576A" stroke="#71CCCE" stroke-width="1.6" />
+<text x="601" y="508" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="20" fill="#F3FCFF" font-weight="700" text-anchor="start" opacity="1" >Current group  G</text>
+<text x="601" y="531" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#BBE5E8" font-weight="400" text-anchor="start" opacity="1" >centroid c(G)</text>
+<rect x="917" y="476" width="178" height="73" rx="13" fill="#554A64" stroke="#D0ADF0" stroke-width="1.2" />
+<text x="930" y="507" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" fill="#F4ECFD" font-weight="700" text-anchor="start" opacity="1" >New unit  uᵢ</text>
+<text x="930" y="528" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#CFBADE" font-weight="400" text-anchor="start" opacity="1" >vector vᵢ</text>
+<g class="join-animated">
+<path d="M909 512 H841" fill="none" stroke="#88DBD9" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)"/>
+<circle cx="909" cy="512" r="7" fill="#91F1DC" stroke="none" stroke-width="1" />
+</g>
+<rect x="586" y="576" width="494" height="56" rx="11" fill="#244453" stroke="#447B85" stroke-width="1" />
+<text x="606" y="612" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="23" fill="#E4FFFA" font-weight="750" text-anchor="start" opacity="1" >cos(vᵢ, c(G))   ≥   0.45 ?</text>
+<path d="M707 637 V662 H675 V681" fill="none" stroke="#76D5C3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)"/>
+<path d="M951 637 V662 H981 V681" fill="none" stroke="#F0BA8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowMuted)"/>
+<text x="620" y="711" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#8AF4D4" font-weight="700" text-anchor="start" opacity="1" >YES → append to G</text>
+<text x="875" y="711" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#F5C198" font-weight="700" text-anchor="start" opacity="1" >NO → new group</text>
+<text x="109" y="759" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="17" fill="#E2F1FB" font-weight="650" text-anchor="start" opacity="1" >The first pass compares a unit only with the last group—not with earlier matching topics.</text>
+<text x="109" y="785" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#9CB6CB" font-weight="400" text-anchor="start" opacity="1" >Schematic vectors and decisions; unit-level similarity scores are not published in the case study.</text>
+</g>
+<g class="scene stage5">
+<text x="98" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#6FE3D7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >STEP 05  /  BUDGET-ENFORCING MERGES</text>
+<text x="98" y="319" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" fill="#F3F8FF" font-weight="700" text-anchor="start" opacity="1" >Reduce adjacent groups until they fit</text>
+<text x="99" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#9FB4CD" font-weight="400" text-anchor="start" opacity="1" >After the ≥ 0.45 pass, repeatedly merge the most similar adjacent pair—even below the threshold.</text>
+<rect x="102" y="378" width="355" height="26" rx="8" fill="#234356" stroke="none" stroke-width="1" />
+<text x="115" y="396" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#8CE5DE" font-weight="700" text-anchor="start" opacity="1" >ACTUAL OPENAI CASE / OUTPUT MEMBERSHIP</text>
+None
+<text x="933" y="397" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#B6D7E8" font-weight="600" text-anchor="end" opacity="1" >44 units  →  30 groups</text>
+<g class="" style="animation-delay:-0.00s">
+<rect x="103.0" y="417.0" width="157" height="52" rx="10" fill="#34515B" stroke="#83E6DA" stroke-width="1.2" />
+<text x="115.0" y="438.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A01</text>
+<text x="115.0" y="460.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U0</text>
+<circle cx="237.0" cy="434.0" r="7" fill="none" stroke="#83E6DA" stroke-width="1.7" />
+<circle cx="237.0" cy="434.0" r="3.2" fill="#83E6DA" stroke="none" stroke-width="1" />
+</g>
+<g class="" style="animation-delay:-0.31s">
+<rect x="272.2" y="417.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="284.2" y="438.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A02</text>
+<text x="284.2" y="460.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U1</text>
+</g>
+<g class="" style="animation-delay:-0.62s">
+<rect x="441.4" y="417.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="453.4" y="438.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A03</text>
+<text x="453.4" y="460.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U2</text>
+</g>
+<g class="" style="animation-delay:-0.93s">
+<rect x="610.6" y="417.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="622.5999999999999" y="438.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A04</text>
+<text x="622.5999999999999" y="460.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U3</text>
+</g>
+<g class="" style="animation-delay:-1.24s">
+<rect x="779.8" y="417.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="791.8" y="438.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A05</text>
+<text x="791.8" y="460.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U4</text>
+</g>
+<g class="" style="animation-delay:-1.55s">
+<rect x="949.0" y="417.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="961.0" y="438.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A06</text>
+<text x="961.0" y="460.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U5</text>
+</g>
+<g class="" style="animation-delay:-0.00s">
+<rect x="103.0" y="480.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="115.0" y="501.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A07</text>
+<text x="115.0" y="523.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U6</text>
+</g>
+<g class="" style="animation-delay:-0.31s">
+<rect x="272.2" y="480.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="284.2" y="501.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A08</text>
+<text x="284.2" y="523.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U7</text>
+</g>
+<g class="" style="animation-delay:-0.62s">
+<rect x="441.4" y="480.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="453.4" y="501.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A09</text>
+<text x="453.4" y="523.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U8</text>
+</g>
+<g class="" style="animation-delay:-0.93s">
+<rect x="610.6" y="480.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="622.5999999999999" y="501.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A10</text>
+<text x="622.5999999999999" y="523.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U9</text>
+</g>
+<g class="" style="animation-delay:-1.24s">
+<rect x="779.8" y="480.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="791.8" y="501.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A11</text>
+<text x="791.8" y="523.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U10</text>
+</g>
+<g class="" style="animation-delay:-1.55s">
+<rect x="949.0" y="480.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="961.0" y="501.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A12</text>
+<text x="961.0" y="523.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U11</text>
+</g>
+<g class="glow-chips" style="animation-delay:-0.00s">
+<rect x="103.0" y="544.0" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="115.0" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A13</text>
+<text x="115.0" y="587.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U12–U15</text>
+<rect x="213.0" y="550.0" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="230.0" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×4</text>
+</g>
+<g class="" style="animation-delay:-0.31s">
+<rect x="272.2" y="544.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="284.2" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A14</text>
+<text x="284.2" y="587.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U16</text>
+</g>
+<g class="glow-chips" style="animation-delay:-0.62s">
+<rect x="441.4" y="544.0" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="453.4" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A15</text>
+<text x="453.4" y="587.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U17–U21</text>
+<rect x="551.4" y="550.0" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="568.4" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×5</text>
+</g>
+<g class="glow-chips" style="animation-delay:-0.93s">
+<rect x="610.6" y="544.0" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="622.5999999999999" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A16</text>
+<text x="622.5999999999999" y="587.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U22–U23</text>
+<rect x="720.5999999999999" y="550.0" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="737.5999999999999" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×2</text>
+</g>
+<g class="glow-chips" style="animation-delay:-1.24s">
+<rect x="779.8" y="544.0" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="791.8" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A17</text>
+<text x="791.8" y="587.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U24–U25</text>
+<rect x="889.8" y="550.0" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="906.8" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×2</text>
+</g>
+<g class="" style="animation-delay:-1.55s">
+<rect x="949.0" y="544.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="961.0" y="565.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A18</text>
+<text x="961.0" y="587.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U26</text>
+</g>
+<g class="glow-chips" style="animation-delay:-0.00s">
+<rect x="103.0" y="607.5" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="115.0" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A19</text>
+<text x="115.0" y="650.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U27–U29</text>
+<rect x="213.0" y="613.5" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="230.0" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×3</text>
+</g>
+<g class="" style="animation-delay:-0.31s">
+<rect x="272.2" y="607.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="284.2" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A20</text>
+<text x="284.2" y="650.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U30</text>
+</g>
+<g class="" style="animation-delay:-0.62s">
+<rect x="441.4" y="607.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="453.4" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A21</text>
+<text x="453.4" y="650.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U31</text>
+</g>
+<g class="" style="animation-delay:-0.93s">
+<rect x="610.6" y="607.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="622.5999999999999" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A22</text>
+<text x="622.5999999999999" y="650.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U32</text>
+</g>
+<g class="" style="animation-delay:-1.24s">
+<rect x="779.8" y="607.5" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="791.8" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A23</text>
+<text x="791.8" y="650.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U33</text>
+</g>
+<g class="glow-chips" style="animation-delay:-1.55s">
+<rect x="949.0" y="607.5" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="961.0" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A24</text>
+<text x="961.0" y="650.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U34–U35</text>
+<rect x="1059.0" y="613.5" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="1076.0" y="628.5" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×2</text>
+</g>
+<g class="glow-chips" style="animation-delay:-0.00s">
+<rect x="103.0" y="671.0" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="115.0" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A25</text>
+<text x="115.0" y="714.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U36–U37</text>
+<rect x="213.0" y="677.0" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="230.0" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×2</text>
+</g>
+<g class="" style="animation-delay:-0.31s">
+<rect x="272.2" y="671.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="284.2" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A26</text>
+<text x="284.2" y="714.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U38</text>
+</g>
+<g class="" style="animation-delay:-0.62s">
+<rect x="441.4" y="671.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="453.4" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A27</text>
+<text x="453.4" y="714.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U39</text>
+</g>
+<g class="" style="animation-delay:-0.93s">
+<rect x="610.6" y="671.0" width="157" height="52" rx="10" fill="#483A5C" stroke="#DEB8FC" stroke-width="1.2" />
+<text x="622.5999999999999" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A28</text>
+<text x="622.5999999999999" y="714.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U40</text>
+<circle cx="744.5999999999999" cy="688.0" r="7" fill="none" stroke="#DEB8FC" stroke-width="1.7" />
+<circle cx="744.5999999999999" cy="688.0" r="3.2" fill="#DEB8FC" stroke="none" stroke-width="1" />
+</g>
+<g class="" style="animation-delay:-1.24s">
+<rect x="779.8" y="671.0" width="157" height="52" rx="10" fill="#1A304C" stroke="#3B5B76" stroke-width="1.2" />
+<text x="791.8" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A29</text>
+<text x="791.8" y="714.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U41</text>
+</g>
+<g class="glow-chips" style="animation-delay:-1.55s">
+<rect x="949.0" y="671.0" width="157" height="52" rx="10" fill="#1D5364" stroke="#76D9DA" stroke-width="1.2" />
+<text x="961.0" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EFFBFF" font-weight="750" text-anchor="start" opacity="1" >A30</text>
+<text x="961.0" y="714.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A3CDDF" font-weight="600" text-anchor="start" opacity="1" >U42–U43</text>
+<rect x="1059.0" y="677.0" width="35" height="21" rx="6" fill="#27596A" stroke="none" stroke-width="1" />
+<text x="1076.0" y="692.0" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#A5F6E4" font-weight="800" text-anchor="middle" opacity="1" >×2</text>
+</g>
+<text x="112" y="772" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#AFC7DB" font-weight="400" text-anchor="start" opacity="1" >Labels use a centroid-nearest original extract. Here colors distinguish group sizes and protected endpoints.</text>
+<text x="112" y="797" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#EDF6FF" font-weight="650" text-anchor="start" opacity="1" >Original IDs, source ranges and roles stay linked. The app uses role-weighted node colors.</text>
+</g>
+<g class="scene stage6">
+<text x="98" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#6FE3D7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >STEP 06  /  GRAPH PROJECTION</text>
+<text x="98" y="319" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" fill="#F3F8FF" font-weight="700" text-anchor="start" opacity="1" >Keep only original external relationships</text>
+<text x="99" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#9FB4CD" font-weight="400" text-anchor="start" opacity="1" >Internal relationships disappear from the compact view; equivalent external arrows aggregate.</text>
+<rect x="102" y="383" width="263" height="77" rx="12" fill="#172E47" stroke="#3A5C73" stroke-width="1" />
+<text x="116" y="412" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#83C8ED" font-weight="800" text-anchor="start" opacity="1" >61</text>
+<text x="116" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#BED0DF" font-weight="400" text-anchor="start" opacity="1" >original edges</text>
+<rect x="381" y="383" width="294" height="77" rx="12" fill="#172E47" stroke="#3A5C73" stroke-width="1" />
+<text x="395" y="412" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#EBC188" font-weight="800" text-anchor="start" opacity="1" >10</text>
+<text x="395" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#BED0DF" font-weight="400" text-anchor="start" opacity="1" >internal edges hidden</text>
+<rect x="691" y="383" width="415" height="77" rx="12" fill="#172E47" stroke="#3A5C73" stroke-width="1" />
+<text x="705" y="412" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#72E2D3" font-weight="800" text-anchor="start" opacity="1" >51 refs → 49 arrows</text>
+<text x="705" y="440" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#BED0DF" font-weight="400" text-anchor="start" opacity="1" >external evidence</text>
+<text x="109" y="497" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#96B6C9" font-weight="700" text-anchor="start" opacity="1" letter-spacing=".8" >ILLUSTRATIVE PROJECTION • NOT THE CASE STUDY TOPOLOGY</text>
+<rect x="286" y="513" width="447" height="102" rx="13" fill="#214655" stroke="#427987" stroke-width="1.3" />
+<text x="508" y="531" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" fill="#9BE7DF" font-weight="700" text-anchor="middle" opacity="1" letter-spacing="1.2" >ONE GROUP</text>
+<rect x="120" y="543" width="90" height="57" rx="10" fill="#263A58" stroke="#4D6C88" stroke-width="1.3" />
+<text x="165" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#ECF6FE" font-weight="700" text-anchor="middle" opacity="1" >u0</text>
+<path d="M211 569 H285" fill="none" stroke="#77C7CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<rect x="292" y="543" width="90" height="57" rx="10" fill="#22405B" stroke="#7CBCC3" stroke-width="1.3" />
+<text x="337" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#ECF6FE" font-weight="700" text-anchor="middle" opacity="1" >u1</text>
+<path d="M383 569 H457" fill="none" stroke="#77C7CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<rect x="464" y="543" width="90" height="57" rx="10" fill="#22405B" stroke="#7CBCC3" stroke-width="1.3" />
+<text x="509" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#ECF6FE" font-weight="700" text-anchor="middle" opacity="1" >u2</text>
+<path d="M555 569 H629" fill="none" stroke="#77C7CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<rect x="636" y="543" width="90" height="57" rx="10" fill="#22405B" stroke="#7CBCC3" stroke-width="1.3" />
+<text x="681" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#ECF6FE" font-weight="700" text-anchor="middle" opacity="1" >u3</text>
+<path d="M727 569 H801" fill="none" stroke="#77C7CC" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<rect x="808" y="543" width="90" height="57" rx="10" fill="#263A58" stroke="#4D6C88" stroke-width="1.3" />
+<text x="853" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#ECF6FE" font-weight="700" text-anchor="middle" opacity="1" >u4</text>
+<path d="M899 569 H973" fill="none" stroke="#68879D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<rect x="980" y="543" width="90" height="57" rx="10" fill="#263A58" stroke="#4D6C88" stroke-width="1.3" />
+<text x="1025" y="576" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="19" fill="#ECF6FE" font-weight="700" text-anchor="middle" opacity="1" >u5</text>
+<text x="508" y="632" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A8D8DD" font-weight="600" text-anchor="middle" opacity="1" >u1 → u2 → u3 become internal: hidden from compact drawing</text>
+<rect x="73" y="673" width="182" height="79" rx="12" fill="#273D5A" stroke="#5B8DA0" stroke-width="1.2" />
+<text x="164" y="706" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F0FAFF" font-weight="750" text-anchor="middle" opacity="1" >A1</text>
+<text x="164" y="729" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A9CCD8" font-weight="550" text-anchor="middle" opacity="1" >u0</text>
+<rect x="363" y="673" width="182" height="79" rx="12" fill="#23555F" stroke="#5B8DA0" stroke-width="1.2" />
+<text x="454" y="706" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F0FAFF" font-weight="750" text-anchor="middle" opacity="1" >A2</text>
+<text x="454" y="729" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A9CCD8" font-weight="550" text-anchor="middle" opacity="1" >u1–u3</text>
+<rect x="653" y="673" width="182" height="79" rx="12" fill="#273D5A" stroke="#5B8DA0" stroke-width="1.2" />
+<text x="744" y="706" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F0FAFF" font-weight="750" text-anchor="middle" opacity="1" >A3</text>
+<text x="744" y="729" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A9CCD8" font-weight="550" text-anchor="middle" opacity="1" >u4</text>
+<rect x="943" y="673" width="182" height="79" rx="12" fill="#273D5A" stroke="#5B8DA0" stroke-width="1.2" />
+<text x="1034" y="706" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F0FAFF" font-weight="750" text-anchor="middle" opacity="1" >A4</text>
+<text x="1034" y="729" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A9CCD8" font-weight="550" text-anchor="middle" opacity="1" >u5</text>
+<path d="M255 711 H354" fill="none" stroke="#71D5CA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<path d="M545 711 H644" fill="none" stroke="#71D5CA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<path d="M835 711 H934" fill="none" stroke="#71D5CA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<text x="110" y="797" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#BCE3E4" font-weight="650" text-anchor="start" opacity="1" >No synthetic “next” edges. All surviving arrows point forward, so the result is a DAG.</text>
+</g>
+<g class="scene stage7">
+<text x="98" y="270" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#6FE3D7" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >STEP 07  /  LAYOUT + REUSE</text>
+<text x="98" y="319" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="31" fill="#F3F8FF" font-weight="700" text-anchor="start" opacity="1" >Draw the compact graph and keep the trail</text>
+<text x="99" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#9FB4CD" font-weight="400" text-anchor="start" opacity="1" >Grouping fixes membership and relationships; ELK then positions nodes for SVG rendering.</text>
+<rect x="106" y="387" width="304" height="90" rx="12" fill="#19334B" stroke="#42637D" stroke-width="1" />
+<text x="121" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="29" fill="#7EE3D6" font-weight="800" text-anchor="start" opacity="1" >44 → 30</text>
+<text x="121" y="452" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#B6CBDD" font-weight="400" text-anchor="start" opacity="1" >source → output nodes</text>
+<rect x="428" y="387" width="304" height="90" rx="12" fill="#19334B" stroke="#42637D" stroke-width="1" />
+<text x="443" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="29" fill="#93C8EF" font-weight="800" text-anchor="start" opacity="1" >61 → 49</text>
+<text x="443" y="452" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#B6CBDD" font-weight="400" text-anchor="start" opacity="1" >original → display arrows</text>
+<rect x="750" y="387" width="357" height="90" rx="12" fill="#19334B" stroke="#42637D" stroke-width="1" />
+<text x="765" y="421" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="29" fill="#F6C69F" font-weight="800" text-anchor="start" opacity="1" >0 LLM calls</text>
+<text x="765" y="452" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#B6CBDD" font-weight="400" text-anchor="start" opacity="1" >for local simplification</text>
+<rect x="108" y="525" width="202" height="160" rx="14" fill="#225661" stroke="#81E1D5" stroke-width="1.3" />
+<circle cx="136" cy="553" r="10" fill="#81E1D5" stroke="none" stroke-width="1" />
+<text x="127" y="592" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F3F9FF" font-weight="750" text-anchor="start" opacity="1" >SOURCE-LINKED</text>
+<text x="127" y="626" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F3F9FF" font-weight="650" text-anchor="start" opacity="1" >30 groups</text>
+<text x="127" y="655" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#C3D1DF" font-weight="400" text-anchor="start" opacity="1" >complete member IDs</text>
+<rect x="374" y="525" width="202" height="160" rx="14" fill="#213E5B" stroke="#98D1F2" stroke-width="1.3" />
+<circle cx="402" cy="553" r="10" fill="#98D1F2" stroke="none" stroke-width="1" />
+<text x="393" y="592" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F3F9FF" font-weight="750" text-anchor="start" opacity="1" >ELK LAYERED</text>
+<text x="393" y="626" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F3F9FF" font-weight="650" text-anchor="start" opacity="1" >↓ downward</text>
+<text x="393" y="655" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#C3D1DF" font-weight="400" text-anchor="start" opacity="1" >orthogonal routes</text>
+<rect x="640" y="525" width="202" height="160" rx="14" fill="#323D5D" stroke="#B8BEFF" stroke-width="1.3" />
+<circle cx="668" cy="553" r="10" fill="#B8BEFF" stroke="none" stroke-width="1" />
+<text x="659" y="592" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F3F9FF" font-weight="750" text-anchor="start" opacity="1" >SVG VIEW</text>
+<text x="659" y="626" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F3F9FF" font-weight="650" text-anchor="start" opacity="1" >select / inspect</text>
+<text x="659" y="655" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#C3D1DF" font-weight="400" text-anchor="start" opacity="1" >source ranges</text>
+<rect x="906" y="525" width="202" height="160" rx="14" fill="#4C3C46" stroke="#F3C08A" stroke-width="1.3" />
+<circle cx="934" cy="553" r="10" fill="#F3C08A" stroke="none" stroke-width="1" />
+<text x="925" y="592" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#F3F9FF" font-weight="750" text-anchor="start" opacity="1" >INDEXEDDB</text>
+<text x="925" y="626" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="22" fill="#F3F9FF" font-weight="650" text-anchor="start" opacity="1" >saved summary</text>
+<text x="925" y="655" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#C3D1DF" font-weight="400" text-anchor="start" opacity="1" >fingerprinted reuse</text>
+<path d="M312 606 H368" fill="none" stroke="#80D4D4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<path d="M578 606 H634" fill="none" stroke="#80D4D4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<path d="M844 606 H900" fill="none" stroke="#80D4D4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowCyan)" class="flow-animated"/>
+<rect x="105" y="725" width="1002" height="74" rx="12" fill="#153244" stroke="#386E74" stroke-width="1.1" />
+<text x="123" y="754" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#DDF7F1" font-weight="750" text-anchor="start" opacity="1" >Validation before display:</text>
+<text x="328" y="754" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="15" fill="#E1ECF6" font-weight="400" text-anchor="start" opacity="1" >all original IDs exactly once · endpoints protected · source coverage</text>
+<text x="123" y="781" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#A2CED4" font-weight="400" text-anchor="start" opacity="1" >Saved results are reused only when the graph/rule/version/source fingerprint matches.</text>
+</g>
+<g class="scene stage1">
+<text x="1199" y="273" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#66E0D1" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.4" >EXPLANATION</text>
+<text x="1199" y="309" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#F1F7FF" font-weight="760" text-anchor="start" opacity="1" >Original evidence</text>
+<circle cx="1208" cy="349" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Order is stable</text>
+<text x="1222" y="379" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Recorded order; stable ID breaks ties.</text>
+<circle cx="1208" cy="406" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="413" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >One unit per node</text>
+<text x="1222" y="436" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Context and tool nodes also count.</text>
+<circle cx="1208" cy="463" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Source-linked</text>
+<text x="1222" y="493" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Original offsets + selectable ranges.</text>
+<circle cx="1208" cy="520" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="527" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Coverage checked</text>
+<text x="1222" y="550" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Uncovered eligible text gets an owner.</text>
+<rect x="1197" y="574" width="305" height="52" rx="9" fill="#17364B" stroke="#31556A" stroke-width="0.8" />
+<text x="1209" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >Reduction uses existing annotations;</text>
+<text x="1209" y="613" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >it does not call a model.</text>
+</g>
+<g class="scene stage2">
+<text x="1199" y="273" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#66E0D1" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.4" >EXPLANATION</text>
+<text x="1199" y="309" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#F1F7FF" font-weight="760" text-anchor="start" opacity="1" >Protect barriers</text>
+<circle cx="1208" cy="349" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >N ≤ 30 means full detail</text>
+<text x="1222" y="379" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >No clustering or edge aggregation.</text>
+<circle cx="1208" cy="406" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="413" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Protect actual endpoints</text>
+<text x="1222" y="436" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >First and last generated nodes.</text>
+<circle cx="1208" cy="463" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Never cross a barrier</text>
+<text x="1222" y="493" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Split into consecutive flexible runs.</text>
+<circle cx="1208" cy="520" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="527" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Keep trailing tool records</text>
+<text x="1222" y="550" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Tool records may follow the endpoint.</text>
+<rect x="1197" y="574" width="305" height="52" rx="9" fill="#17364B" stroke="#31556A" stroke-width="0.8" />
+<text x="1209" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >The last generated node is not</text>
+<text x="1209" y="613" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >automatically a Conclusion.</text>
+</g>
+<g class="scene stage3">
+<text x="1199" y="273" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#66E0D1" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.4" >EXPLANATION</text>
+<text x="1199" y="309" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#F1F7FF" font-weight="760" text-anchor="start" opacity="1" >Proportional budget</text>
+<circle cx="1208" cy="349" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Start with four slots</text>
+<text x="1222" y="379" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Two protected + two flexible runs.</text>
+<circle cx="1208" cy="406" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="413" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Extra capacity</text>
+<text x="1222" y="436" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Each flexible run: length − 1.</text>
+<circle cx="1208" cy="463" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Largest remainder</text>
+<text x="1222" y="493" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Floor quotas; earlier run breaks ties.</text>
+<circle cx="1208" cy="520" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="527" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Maximum, not a quota</text>
+<text x="1222" y="550" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Unused slots are not reallocated.</text>
+<rect x="1197" y="574" width="305" height="52" rx="9" fill="#17364B" stroke="#31556A" stroke-width="0.8" />
+<text x="1209" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >For this case: the 39-unit middle</text>
+<text x="1209" y="613" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >run gets 26 output slots.</text>
+</g>
+<g class="scene stage4">
+<text x="1199" y="273" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#66E0D1" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.4" >EXPLANATION</text>
+<text x="1199" y="309" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#F1F7FF" font-weight="760" text-anchor="start" opacity="1" >Two-stage grouping</text>
+<circle cx="1208" cy="349" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Use original source text</text>
+<text x="1222" y="379" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Not the shortened screen labels.</text>
+<circle cx="1208" cy="406" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="413" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Sparse TF-IDF</text>
+<text x="1222" y="436" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Top 48 terms, normalized vectors.</text>
+<circle cx="1208" cy="463" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Forward pass</text>
+<text x="1222" y="493" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Append if cosine is ≥ 0.45.</text>
+<circle cx="1208" cy="520" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="527" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Order constrained</text>
+<text x="1222" y="550" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Never merge nonadjacent passages.</text>
+<rect x="1197" y="574" width="305" height="52" rx="9" fill="#17364B" stroke="#31556A" stroke-width="0.8" />
+<text x="1209" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >Lexical similarity is not</text>
+<text x="1209" y="613" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >logical equivalence or truth.</text>
+</g>
+<g class="scene stage5">
+<text x="1199" y="273" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#66E0D1" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.4" >EXPLANATION</text>
+<text x="1199" y="309" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#F1F7FF" font-weight="760" text-anchor="start" opacity="1" >Materialize members</text>
+<circle cx="1208" cy="349" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Best adjacent pair</text>
+<text x="1222" y="379" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Merge until within each run budget.</text>
+<circle cx="1208" cy="406" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="413" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >No threshold on merges</text>
+<text x="1222" y="436" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Even cosine = 0 can be necessary.</text>
+<circle cx="1208" cy="463" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Representative extract</text>
+<text x="1222" y="493" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Earliest max-centroid-similarity unit.</text>
+<circle cx="1208" cy="520" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="527" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Dominant role weight</text>
+<text x="1222" y="550" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Sum original source-span lengths.</text>
+<rect x="1197" y="574" width="305" height="52" rx="9" fill="#17364B" stroke="#31556A" stroke-width="0.8" />
+<text x="1209" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >These 30 intervals are from</text>
+<text x="1209" y="613" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >the documented OpenAI replay.</text>
+</g>
+<g class="scene stage6">
+<text x="1199" y="273" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#66E0D1" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.4" >EXPLANATION</text>
+<text x="1199" y="309" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#F1F7FF" font-weight="760" text-anchor="start" opacity="1" >Project the edges</text>
+<circle cx="1208" cy="349" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Same owner</text>
+<text x="1222" y="379" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Original edge becomes internal.</text>
+<circle cx="1208" cy="406" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="413" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Different owners</text>
+<text x="1222" y="436" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Keep original relationship label.</text>
+<circle cx="1208" cy="463" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Equal triples</text>
+<text x="1222" y="493" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Aggregate; retain contributing IDs.</text>
+<circle cx="1208" cy="520" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="527" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >DAG remains</text>
+<text x="1222" y="550" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Original edges move strictly forward.</text>
+<rect x="1197" y="574" width="305" height="52" rx="9" fill="#17364B" stroke="#31556A" stroke-width="0.8" />
+<text x="1209" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >No “next” arrows are invented</text>
+<text x="1209" y="613" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >by adjacency or similarity.</text>
+</g>
+<g class="scene stage7">
+<text x="1199" y="273" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#66E0D1" font-weight="750" text-anchor="start" opacity="1" letter-spacing="1.4" >EXPLANATION</text>
+<text x="1199" y="309" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="25" fill="#F1F7FF" font-weight="760" text-anchor="start" opacity="1" >Present and persist</text>
+<circle cx="1208" cy="349" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="356" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Layout is separate</text>
+<text x="1222" y="379" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >ELK only positions existing nodes.</text>
+<circle cx="1208" cy="406" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="413" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Render interactively</text>
+<text x="1222" y="436" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >SVG + original source selections.</text>
+<circle cx="1208" cy="463" r="4" fill="#5AD9C7" stroke="none" stroke-width="1" />
+<text x="1222" y="470" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Validate &amp; cache</text>
+<text x="1222" y="493" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >SHA-256 fingerprint / IndexedDB v4.</text>
+<circle cx="1208" cy="520" r="4" fill="#A5C2E8" stroke="none" stroke-width="1" />
+<text x="1222" y="527" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16" fill="#E8F4FB" font-weight="700" text-anchor="start" opacity="1" >Refresh geometry</text>
+<text x="1222" y="550" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#99B5C9" font-weight="400" text-anchor="start" opacity="1" >Without rerunning grouping.</text>
+<rect x="1197" y="574" width="305" height="52" rx="9" fill="#17364B" stroke="#31556A" stroke-width="0.8" />
+<text x="1209" y="594" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >No request to a model or</text>
+<text x="1209" y="613" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="13" fill="#A5DCDE" font-weight="500" text-anchor="start" opacity="1" >FastAPI summary endpoint.</text>
+</g>
+<text x="79" y="863" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="11" fill="#86A4BA" font-weight="700" text-anchor="start" opacity="1" letter-spacing="1.4" >AUTO-LOOP  •  7 STAGES  •  42 SECONDS</text>
+<rect x="77" y="882" width="1035" height="6" rx="3" fill="#243A53" stroke="none" stroke-width="1" />
+<rect class="svg-progress" x="77" y="882" width="1035" height="6" rx="3" fill="url(#barFill)"/>
+<line x1="224.9" y1="879" x2="224.9" y2="893" stroke="#1A324C" stroke-width="2" />
+<line x1="372.7" y1="879" x2="372.7" y2="893" stroke="#1A324C" stroke-width="2" />
+<line x1="520.6" y1="879" x2="520.6" y2="893" stroke="#1A324C" stroke-width="2" />
+<line x1="668.4" y1="879" x2="668.4" y2="893" stroke="#1A324C" stroke-width="2" />
+<line x1="816.3" y1="879" x2="816.3" y2="893" stroke="#1A324C" stroke-width="2" />
+<line x1="964.1" y1="879" x2="964.1" y2="893" stroke="#1A324C" stroke-width="2" />
+<g id="prevBtn" class="controls" role="button" tabindex="0" aria-label="Previous stage">
+<rect x="1155" y="860" width="51" height="48" rx="11" fill="#183048" stroke="#46647D" stroke-width="1.2" />
+<path d="M1185 876 l-13 9 13 9 Z" fill="#C0E1EB" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<g id="playBtn" class="controls" role="button" tabindex="0" aria-label="Pause or play animation">
+<rect x="1214" y="860" width="126" height="48" rx="11" fill="#21515A" stroke="#4AA696" stroke-width="1.2" />
+<g id="pauseIcon"><rect x="1231" y="875" width="5" height="19" rx="1" fill="#D5FFF4" stroke="none" stroke-width="1" /><rect x="1240" y="875" width="5" height="19" rx="1" fill="#D5FFF4" stroke="none" stroke-width="1" /></g>
+<g id="playIcon" visibility="hidden"><path d="M1232 875 L1246 885 L1232 895 Z" fill="#E4FFF7" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" /></g>
+<text x="1262" y="891" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#E5FFFC" font-weight="700" text-anchor="start" opacity="1" id="playBtnText">PAUSE</text>
+</g>
+<g id="nextBtn" class="controls" role="button" tabindex="0" aria-label="Next stage">
+<rect x="1348" y="860" width="51" height="48" rx="11" fill="#183048" stroke="#46647D" stroke-width="1.2" />
+<path d="M1370 875 l13 10 -13 10 Z" fill="#C0E1EB" stroke="none" stroke-width="0" stroke-linecap="round" stroke-linejoin="round" />
+</g>
+<g id="replayBtn" class="controls" role="button" tabindex="0" aria-label="Restart animation">
+<rect x="1407" y="860" width="113" height="48" rx="11" fill="#183048" stroke="#46647D" stroke-width="1.2" />
+<text x="1430" y="891" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="14" fill="#E9F5FC" font-weight="700" text-anchor="start" opacity="1" >REPLAY ↻</text>
+</g>
+<text x="78" y="923" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="12" fill="#7899B1" font-weight="400" text-anchor="start" opacity="1" >Based on Reasoning Graph (Local) · 19 Oct 2026 · OpenAI case: 44 → 30 nodes, 61 → 49 arrows</text>
+<text x="1510" y="923" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="10" fill="#7899B1" font-weight="600" text-anchor="end" opacity="1" >ILLUSTRATIONS LABELED WHERE SCHEMATIC</text>
+<script type="application/ecmascript"><![CDATA[
+(function(){
+  'use strict';
+  var T=84000, D=12000, paused=false;
+  function animations(){ return Array.prototype.filter.call(document.getAnimations(), function(a){return a.effect;}); }
+  function position(){
+    var a=animations().filter(function(x){return x.animationName==='barProgress';});
+    return a.length? Math.max(0, Math.min(T, (a[0].currentTime||0))) : 0;
+  }
+  function seek(ms){
+    var target=Math.max(0, Math.min(T, ms)); animations().forEach(function(a){try{ a.currentTime=target; if(paused){a.pause();}else{a.play();}}catch(e){}});
+  }
+  function icons(){
+    var t=document.getElementById('playBtnText');
+    t.textContent=paused?'PLAY':'PAUSE';
+    document.getElementById('pauseIcon').setAttribute('visibility', paused?'hidden':'visible');
+    document.getElementById('playIcon').setAttribute('visibility', paused?'visible':'hidden');
+  }
+  function action(id, fn){
+    var el=document.getElementById(id); if(!el)return;
+    el.addEventListener('click',fn);
+    el.addEventListener('keydown',function(ev){ if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();fn();}});
+  }
+  action('playBtn', function(){paused=!paused;animations().forEach(function(a){if(paused)a.pause();else a.play();});icons();});
+  action('prevBtn',function(){var idx=Math.floor((Math.max(0, position()-1)+200)/D)-1; if(idx<0) idx=0; seek(idx*D+1400);});
+  action('nextBtn',function(){var idx=Math.floor(position()/D)+1; if(idx>6) idx=6; seek(idx*D+1400);});
+  action('replayBtn',function(){seek(0);});
+  for(var i=1;i<=7;i++)(function(j){action('nav'+j,function(){seek((j-1)*D+1400);});})(i);
+  icons();
+})();
+]]></script>
+</svg>
