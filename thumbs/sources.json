@@ -1,6 +1,6 @@
 {
-  "description": "One representative thumbnail per paper subfolder. Source paths are relative to the repository root; DOCX members are ZIP archive paths; PDF page numbers are one-based.",
-  "processing": "PNG output, maximum 720 by 480 pixels, original aspect ratio preserved. Existing figures retain the attribution and source context documented in their parent papers.",
+  "description": "Representative thumbnails for paper subfolders. Source paths are relative to the repository root; DOCX members are ZIP archive paths; PDF page numbers are one-based.",
+  "processing": "Extracted thumbnails use PNG output, maximum 720 by 480 pixels, original aspect ratio preserved. User-supplied images are preserved as provided. Existing figures retain the attribution and source context documented in their parent papers.",
   "thumbnails": [
     {
       "folder": "15 Chat Interaction Techniques",
@@ -96,6 +96,13 @@
       "source": "ReasoningFlow with Tool Call and Web Search/ReasoningFlowWithToolCall Long.docx",
       "member": "word/media/mdimage1.png",
       "method": "Embedded illustration, resized proportionally without cropping."
+    },
+    {
+      "folder": "ReasoningFlow with Tool Call and Web Search",
+      "thumbnail": "SecondPicture.png",
+      "source": "thumbs/SecondPicture.png",
+      "description": "User-supplied Reasoning Workspace screenshot showing the local reasoning graph linked to source text in the Brother of a fox conversation.",
+      "method": "User-supplied PNG, preserved as provided and displayed at 240 pixels wide in the README."
     },
     {
       "folder": "Software Project Layout - project-layout.md",
